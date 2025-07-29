@@ -14,25 +14,29 @@ const pool = mysql.createPool({
 
 // ดึงสินค้าทั้งหมด
 app.get('/products', (req, res) => {
-  pool.query('SELECT * FROM products', (err, results) => {
-    if (err) return res.status(500).json({ error: err.message });
+  const sql = 'SELECT * FROM products';
+  db.query(sql, (err, results) => {
+    if (err) return res.status(500).send('เกิดข้อผิดพลาด');
     res.json(results);
   });
 });
 
 // ดึงสินค้าตาม ID
 app.get('/products/:id', (req, res) => {
-  pool.query('SELECT * FROM products WHERE id = ?', [req.params.id], (err, results) => {
-    if (err) return res.status(500).json({ error: err.message });
+  const id = req.params.id;
+  const sql = 'SELECT * FROM products WHERE id = ?';
+  db.query(sql, [id], (err, results) => {
+    if (err) return res.status(500).send('เกิดข้อผิดพลาด');
     res.json(results[0] || {});
   });
 });
 
-// ค้นหาสินค้าตาม keyword
+// ค้นหาสินค้าตามคำค้น
 app.get('/products/search/:keyword', (req, res) => {
   const keyword = `%${req.params.keyword}%`;
-  pool.query('SELECT * FROM products WHERE name LIKE ?', [keyword], (err, results) => {
-    if (err) return res.status(500).json({ error: err.message });
+  const sql = 'SELECT * FROM products WHERE name LIKE ?';
+  db.query(sql, [keyword], (err, results) => {
+    if (err) return res.status(500).send('เกิดข้อผิดพลาด');
     res.json(results);
   });
 });
