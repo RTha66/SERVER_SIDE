@@ -4,12 +4,18 @@ const mysql = require('mysql2');
 const app = express();
 const port = 3000;
 
-const pool = mysql.createPool({
+const db = mysql.createConnection({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE,
   port: process.env.DB_PORT
+});
+
+app.use(express.json());
+
+app.get('/', (req, res) => {
+  res.send('เซิร์ฟเวอร์ทำงานปกติ');
 });
 
 // ดึงสินค้าทั้งหมด
@@ -41,11 +47,11 @@ app.get('/products/search/:keyword', (req, res) => {
   });
 });
 
-app.use(express.json());
 
+//เพิ่มสินค้าใหม่
 app.post('/products', (req, res) => {
     const { name, price, discount, review_count, image_url } = req.body;
-    createConnection.query('INSERT INTO products (name, price, discount, review_count, image_url) VALUES (?, ?, ?, ?, ?)',
+    db.query('INSERT INTO products (name, price, discount, review_count, image_url) VALUES (?, ?, ?, ?, ?)',
       [name, price, discount, review_count, image_url],
       (err, results) => {
         if (err) return res.status(500).json({ error: err.message });
@@ -53,6 +59,31 @@ app.post('/products', (req, res) => {
       }
     );
 })
+
+//แก้ไขสินค้า
+app.put('/products/:id', (req, res) => {
+  const { name, price, discount, review_count, image_url } = req.body;
+  db.query(
+    'UPDATE products SET name = ?, price = ?, discount = ?, review_count = ?, image_url = ? WHERE id = ?',
+    [name, price, discount, review_count, image_url, req.params.id],
+    (err) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ message: 'Product update'});
+    }
+  );
+});
+
+//ลบสินค้า
+app.delete('/products/:id', (req, res) => {
+  db.query(
+    'DELETE FROM products WHERE id = ?',
+    [req.params.id],
+    (err) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ message: 'Product deleted' });
+    }
+  );
+});
 
 app.listen(port, () => {
   console.log(`API running at http://localhost:${port}`);
