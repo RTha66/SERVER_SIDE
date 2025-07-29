@@ -41,6 +41,21 @@ app.get('/products/search/:keyword', (req, res) => {
   });
 });
 
+app.use(express.json());
+
+app.post('/products', (req, res) => {
+    const { name, price, discount, review_count, image_url } = req.body;
+    createConnection.query('INSERT INTO products (name, price, discount, review_count, image_url) VALUES (?, ?, ?, ?, ?)',
+      [name, price, discount, review_count, image_url],
+      (err, results) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.status(201).json({ id: results.insertId, massage: 'Product created successfully' });
+      }
+    );
+})
+
+
+
 app.listen(port, () => {
   console.log(`API running at http://localhost:${port}`);
 });
