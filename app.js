@@ -20,7 +20,7 @@ app.get('/', (req, res) => {
 
 // ดึงสินค้าทั้งหมด
 app.get('/products', (req, res) => {
-  const sql = 'SELECT * FROM products';
+  const sql = 'SELECT * FROM products WHERE is_deleted = 0';
   db.query(sql, (err, results) => {
     if (err) return res.status(500).send('เกิดข้อผิดพลาด');
     res.json(results);
@@ -30,7 +30,7 @@ app.get('/products', (req, res) => {
 // ดึงสินค้าตาม ID
 app.get('/products/:id', (req, res) => {
   const id = req.params.id;
-  const sql = 'SELECT * FROM products WHERE id = ?';
+  const sql = 'SELECT * FROM products WHERE id = ? AND is_deleted = 0';
   db.query(sql, [id], (err, results) => {
     if (err) return res.status(500).send('เกิดข้อผิดพลาด');
     res.json(results[0] || {});
@@ -40,7 +40,7 @@ app.get('/products/:id', (req, res) => {
 // ค้นหาสินค้าตามคำค้น
 app.get('/products/search/:keyword', (req, res) => {
   const keyword = `%${req.params.keyword}%`;
-  const sql = 'SELECT * FROM products WHERE name LIKE ?';
+  const sql = 'SELECT * FROM products WHERE name LIKE ? AND is_deleted = 0';
   db.query(sql, [keyword], (err, results) => {
     if (err) return res.status(500).send('เกิดข้อผิดพลาด');
     res.json(results);
@@ -73,14 +73,26 @@ app.put('/products/:id', (req, res) => {
   );
 });
 
-//ลบสินค้า
+//ลบสินค้า SOFT
 app.delete('/products/:id', (req, res) => {
   db.query(
-    'DELETE FROM products WHERE id = ?',
+    'UPDATE products SET is_deleted = 1 WHERE id = ?',
     [req.params.id],
     (err) => {
       if (err) return res.status(500).json({ error: err.message });
-      res.json({ message: 'Product deleted' });
+      res.json({ message: 'Product soft-deleted' });
+    }
+  );
+});
+
+//API กู้คืนข้อมูลที่ถูกลบ
+app.put('/products/restore/:id', (req, res) => {
+  db.query(
+    'UPDATE products SET is_deleted = 0 WHERE id = ?',
+    [req.params.id],
+    (err) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ message: 'Product restored'});
     }
   );
 });
