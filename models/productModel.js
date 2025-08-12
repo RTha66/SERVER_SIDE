@@ -1,7 +1,14 @@
 const db = require('../config/db');
 const { v4: uuidv4 } = require('uuid'); // เพิ่ม UUID สำหรับสร้าง ID สินค้าใหม่
+const { getProductsView } = require('../controllers/productController');
 
 const Product = {
+    // ดึงข้อมูลสินค้าทั้งหมด
+    getProductsView: (callback) => {
+        const query = 'SELECT * FROM products WHERE is_deleted = 0';
+        db.query(query, callback);
+    },
+    
     // ดึงข้อมูลสินค้าทั้งหมด
     getAll: (callback) => {
         const query = 'SELECT * FROM products WHERE is_deleted = 0';

@@ -5,7 +5,7 @@ const PORT = 3000;
 const pRoutes = require('./routes/productRoutes');
 
 app.use(express.json());
-app.use('/api', pRoutes);
+app.use('/api', pRoutes)
 
 // Start server
 

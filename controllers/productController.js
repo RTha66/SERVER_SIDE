@@ -1,6 +1,15 @@
 const Product = require('../models/productModel');
 
 const productController = {
+
+    //ADD views for products
+    getProductsView: (req, res) => {
+        Product.getAll((err, results) => {
+            if (err) return res.status(500).json({ error: err.message });
+            res.json(results);
+        });
+    },
+
     // Get all products
     getAllProducts: (req, res) => {
         Product.getAll((err, results) => { // เรียกใช้เมธอด getAll จาก Product Model
