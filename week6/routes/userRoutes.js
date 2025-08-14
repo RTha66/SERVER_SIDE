@@ -1,8 +1,9 @@
 import userController from "../controllers/userController.js"
+import testMiddleware from "../middlewares/testMiddleware.js"
 
 const useUserRoute = async (router) => {
   router.get('/user', (req, res, next) => {
-    console.log("Authen") 
+    console.log("Authen")
     next()
   },
   userController.getAllUsers
