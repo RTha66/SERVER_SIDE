@@ -8,6 +8,11 @@ const userController = {
   getUserById: async (req, res) => {
     const id = req.params.id
     const user = await userService.getUserById(id)
+    if(!user){
+      res.status(404).json({
+        message: "Not Found"
+      })
+    }
     res.status(200).json(user)
   },
   create: async (req, res) => {
