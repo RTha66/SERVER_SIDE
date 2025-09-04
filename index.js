@@ -1,16 +1,27 @@
-const express = require('express');
-const app = express();
-const PORT = 3000;
+import dotenv from 'dotenv'
+import express from 'express'
+import mongoose from 'mongoose'
+import router from './routes/router.js'
 
-const pRoutes = require('./routes/productRoutes');
+const app = express()
+const port = 3000
 
-app.use(express.json());
-app.use('/api', pRoutes)
+dotenv.config()
 
-// Start server
+const dbUrl = process.env.DB_URL
+const connect = async () => {
+   try {
+      await mongoose.connect(dbUrl)  
+      console.log('Connected to MongoDB successfully')
+   } catch (error) {
+      console.error('Error connecting to MongoDB:', error)
+   }
+}
+await connect()
 
-app.listen(PORT, () => {
+app.use(express.json())
+app.use("/api", router)
 
-          console.log(`🚀 Server is running at http://localhost:${PORT}`);
-
-});
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`)
+})
